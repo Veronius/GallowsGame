@@ -4,8 +4,10 @@ import Header from './components/Header'
 import Figure from './components/Figure'
 import WrongLetters from './components/WrongLetters'
 import Word from './components/Word'
+import Popup from './components/Popup'
+import Notification from './components/Notification'
 import './App.css';
-
+import {showNotification as show} from './helpers/helpers'
 
 const words = ['minsk', 'forest', 'lake', 'swamp', 'raven'];
 
@@ -17,6 +19,7 @@ function App() {
   const [playable, SetPlayable] = useState(true);
   const [correctLetters, SetCorrectLetters] = useState([])
   const [wrongLetters, SetWrongLetters] = useState([])
+  const [showNotification, SetShowNotification] = useState(false)
 
   useEffect(() => {
     const handleKeydown = event => {
@@ -29,13 +32,13 @@ function App() {
               SetCorrectLetters(currentLetters => [...currentLetters, letter])
 
             } else {
-              // showNotification();
+              show(SetShowNotification)
             }
           } else {
             if (!wrongLetters.includes(letter)) {
               SetWrongLetters(wrongLetters => [...wrongLetters, letter])
             } else {
-              // showNotification();
+              show(SetShowNotification)
             }
           }
         }
@@ -46,14 +49,27 @@ function App() {
 
   }, [correctLetters, wrongLetters, playable])
 
+  function playAgain() {
+    SetPlayable(true);
+
+    SetCorrectLetters([]);
+    SetWrongLetters([])
+
+    const random = Math.floor(Math.random() * words.length);
+    selectedWord = words[random]
+  }
+
   return (
     <>
       <Header />
       <div className="main-container">
-        <Figure />
+        <Figure wrongLetters={wrongLetters} />
         <WrongLetters wrongLetters={wrongLetters} />
         <Word selectedWord={selectedWord} correctLetters={correctLetters}/>
+        
       </div>
+      <Popup wrongLetters={wrongLetters} correctLetters={correctLetters} selectedWord={selectedWord} SetPlayable={SetPlayable} playAgain={playAgain} />
+        <Notification showNotification={showNotification} />
       
     </>
   );
